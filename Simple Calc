@@ -1,0 +1,117 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Calc : Form
+    {
+        Double Value = 0;
+        String Operation = "";
+        bool isOperation = false;
+        public Calc()
+        {
+            InitializeComponent();
+        }
+
+        private void btn_click(object sender, EventArgs e)
+        {
+            if ((txtResult.Text == "0") || (isOperation))
+                txtResult.Clear();
+
+            isOperation = false;
+            Button button = (Button)sender;
+           if(txtResult.Text == ".")
+            {
+                if(txtResult.Text.Contains("."))
+                    txtResult.Text = txtResult.Text + button.Text;
+            }else
+            txtResult.Text = txtResult.Text + button.Text;
+        }
+
+        private void op_click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                Button button = (Button)sender;
+                if (Value != 0)
+                {
+                    button4.PerformClick();
+                    Operation = button.Text;
+                    Value = Double.Parse(txtResult.Text);
+                    label1.Text = Value + " " + Operation;
+                    isOperation = true;
+                }
+                else
+                {
+
+
+                    Operation = button.Text;
+                    Value = Double.Parse(txtResult.Text);
+                    label1.Text = Value + " " + Operation;
+                    isOperation = true;
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("This is just a simple calculator!");
+            }
+                }
+            
+        
+        private void button17_Click(object sender, EventArgs e)
+        {
+            txtResult.Text = "0";
+        }
+
+        private void button20_Click(object sender, EventArgs e)
+        {
+            txtResult.Text = "0";
+            Value = 0;
+        }
+
+        private void button4_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                switch (Operation)
+                {
+
+                    case "+":
+                        txtResult.Text = (Value + Double.Parse(txtResult.Text)).ToString();
+                        break;
+                    case "-":
+                        txtResult.Text = (Value - Double.Parse(txtResult.Text)).ToString();
+                        break;
+                    case "*":
+                        txtResult.Text = (Value * Double.Parse(txtResult.Text)).ToString();
+                        break;
+                    case "/":
+                        txtResult.Text = (Value / Double.Parse(txtResult.Text)).ToString();
+                        break;
+                    default:
+                        break;
+                }
+
+
+                Value = Double.Parse(txtResult.Text);
+                label1.Text = "";
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("This is just a simple calculator!");
+            }
+        }
+
+       
+                }
+
+                }
+    
+
