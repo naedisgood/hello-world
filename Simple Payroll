@@ -1,0 +1,54 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.OleDb;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Payroll : Form
+    {
+        OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+        OleDbCommand dc;
+        public Payroll()
+        {
+            InitializeComponent();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            con.Open();
+            dc = new OleDbCommand("INSERT INTO Payroll (Days, Late, SSS, [Pag-ibig], Philhealth, Overtime, Total) VALUES ('" + txtDate.Text + "','" + txtLate.Text + "','" + txtSSS.Text + "','" + txtPag.Text + "','" + txtPhil.Text + "','" + txtOT.Text + "','" + txtTotal.Text + "')", con);
+            dc.ExecuteNonQuery();
+            con.Close();
+            MessageBox.Show("Transaction Completed");
+            OleDbDataAdapter da = new OleDbDataAdapter("SELECT * From Payroll", con);
+            DataTable ds = new DataTable();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds;
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            Int32 val1 = Convert.ToInt32(txtDate.Text);
+            Int32 val2 = Convert.ToInt32(txtWage.Text);
+            decimal val4 = decimal.Parse(txtOT.Text);
+            decimal val5 = decimal.Parse(txtPag.Text);
+            decimal val6 = decimal.Parse(txtSSS.Text);
+            decimal val7 = decimal.Parse(txtLate.Text);
+
+            var val3 = val1 * val2 + val4 - val7 - val6 - val5 ;
+
+            txtTotal.Text = val3.ToString();
+        }
+
+
+
+      
+    }
+}
