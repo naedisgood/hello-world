@@ -1,0 +1,253 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.OleDb;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Form3 : Form
+    {
+        OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+        OleDbCommand dc;
+        public Form3()
+        {
+            
+            InitializeComponent();
+            
+            booms();
+        }
+
+        
+
+        private void txtLoad_Click(object sender, EventArgs e)
+        {
+
+        }
+        private void load()
+        {
+            oe();
+            os();
+            ar();
+            Cash();
+            tca();
+            tna();
+            ta();
+            
+        }
+        private void booms()
+        {
+            OleDbDataAdapter   com = new OleDbDataAdapter("SELECT * from [Balance Sheet]",con);
+            DataTable dt = new DataTable();
+            com.Fill(dt);
+            dataGridView1.DataSource=dt;
+
+        
+        }
+        private void oe()
+        {
+            con.Open();
+            dc = new OleDbCommand("SELECT SUM([Office Equipment]) from Expenses", con);
+            txtOE.Text = dc.ExecuteScalar().ToString();
+            con.Close(); 
+        }
+        private void ar()
+        {
+            string asd="Account Receivable";
+            con.Open();
+            OleDbCommand cmd = new OleDbCommand("SELECT SUM(Amount) from Sales WHERE [Account Title] LIKE'"+asd+"%'",con);
+            txtAR.Text = cmd.ExecuteScalar().ToString();
+            con.Close();
+        }
+        private void Cash()
+        {
+            string sad = "Cash";
+            con.Open();
+            OleDbCommand cmd = new OleDbCommand("SELECT SUM(Amount) from Sales WHERE [Account Title] LIKE'" + sad + "%'", con);
+            txtCash.Text = cmd.ExecuteScalar().ToString();
+            con.Close();
+            
+        }
+        private void os()
+        {
+            con.Open();
+            dc = new OleDbCommand("SELECT SUM([Office Supply]) from Expenses", con);
+            txtOS.Text = dc.ExecuteScalar().ToString();
+            con.Close();
+
+        }
+        private void tca()
+        {
+            if (string.IsNullOrEmpty(txtCash.Text) && string.IsNullOrEmpty(txtAR.Text) && string.IsNullOrEmpty(txtOE.Text))
+            {
+                MessageBox.Show("Please insert a value");
+            }
+            else
+            {
+            txtTCA.Text = txtCash.Text + txtAR.Text + txtOE.Text;
+            }
+        }
+        private void tna()
+        {
+            double a = double.Parse(txtOE.Text);
+            txtTNA.Text = a.ToString();
+        }
+        private void ta()
+        {
+            double d = double.Parse(txtTCA.Text);
+            double e = double.Parse(txtTNA.Text);
+            txtTA.Text = (d + e).ToString();
+ 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+            booms();
+            upCash();
+            upAR();
+            upOE();
+            upOS();
+            upTCA();
+            upTNA();
+            upTA();
+        }
+        private void upCash()
+        {
+            string z = "Cash:";
+            con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET Amount ='" + txtCash.Text + "' WHERE ([Balance Sheet].Assets = '"+ z +"')", con);
+            com.ExecuteNonQuery();
+            con.Close();
+
+        }
+        private void upAR()
+        {
+            string v = "Account Receivable:";
+           
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET   Amount ='" + txtAR.Text + "' WHERE  ([Balance Sheet].Assets = '" + v + "')", con);
+            com.ExecuteNonQuery();
+            con.Close();
+        }
+        private void upOE()
+        {
+            string b = "Office Equipment:";
+           
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET   Amount ='" + txtOE.Text + "' WHERE  ([Balance Sheet].Assets = '" + b + "')", con);
+            com.ExecuteNonQuery();
+            con.Close();
+
+        }
+        private void upOS()
+        {
+            string x = "Office Supplies:";
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET   Amount ='" + txtOS.Text + "' WHERE  ([Balance Sheet].Assets = '" + x + "')", con);
+            com.ExecuteNonQuery();
+            con.Close();
+        }
+        private void upTCA()
+        {
+            string o = "Total Current Assets:";
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET   Amount ='" + txtTCA.Text + "' WHERE  ([Balance Sheet].Assets = '" + o + "')", con);
+            com.ExecuteNonQuery();
+            con.Close();
+        }
+        private void upTNA()
+        {
+            string p = "Total Non-current Address:";
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET   Amount ='" + txtTNA.Text + "' WHERE  ([Balance Sheet].Assets = '" + p + "')", con);
+            com.ExecuteNonQuery();
+            con.Close();
+        }
+        private void upTA()
+        {
+            string a = "Total Assets:";
+            con.Open();
+            OleDbCommand com = new OleDbCommand("UPDATE [Balance Sheet] SET   Amount ='" + txtTA.Text + "' WHERE  ([Balance Sheet].Assets = '" + a + "')", con);
+            com.ExecuteNonQuery();
+            con.Close(); 
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            load();
+        }
+
+        private void txt_click(object sender, EventArgs e)
+        {
+            string a = "Enter a Value Here";
+            if (txtCash.Text == a )
+                txtCash.Clear();
+        }
+
+        private void txtCash_Leave(object sender, EventArgs e)
+        {
+            string b = "";
+            if (txtCash.Text == b)
+                txtCash.Text = "Enter a Value Here";
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            printPreviewDialog1.ShowDialog();
+        }
+        int i = 0;
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+            int height = 0;
+           
+            Pen p = new Pen(Brushes.Black,2.5f);
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+            stringFormat.LineAlignment = StringAlignment.Center;
+
+            #region AssetsCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(100,100,dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawRectangle(p, new Rectangle(100,100,dataGridView1.Columns[0].Width,dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[0].HeaderText.ToString(),dataGridView1.Font,Brushes.Black,new Rectangle(200,100,dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region AmountCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(100+dataGridView1.Columns[0].Width, 100, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawRectangle(p, new Rectangle(100+dataGridView1.Columns[0].Width, 100, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[1].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(200 + dataGridView1.Columns[0].Width, 100, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            height = 100;
+
+            while (i < dataGridView1.Rows.Count)
+            {
+                height += dataGridView1.Rows[0].Height;
+
+                
+                e.Graphics.DrawRectangle(p, new Rectangle(100, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[0].FormattedValue.ToString(),dataGridView1.Font,Brushes.Black,new Rectangle(200, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+                e.Graphics.DrawRectangle(p, new Rectangle(100+dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[1].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(200 + dataGridView1.Columns[0].Width,height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+             
+                i++;
+            }
+        }
+
+        private void printPreviewDialog1_Load(object sender, EventArgs e)
+        {
+
+        }
+    }
+}
