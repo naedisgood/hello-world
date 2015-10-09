@@ -1,0 +1,97 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.OleDb;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void groupBox1_Enter(object sender, EventArgs e)
+        {
+
+        }
+        private int _attemps;
+        private void button1_Click(object sender, EventArgs e)
+        {
+             _attemps++;
+            string a = txtUser.Text;
+            string b = txtPass.Text;
+            int y = 0;
+             
+        string queryText = @"SELECT Count(*) FROM usersdtb WHERE username = @Username AND password = @Password";
+        OleDbConnection cn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\usersAcct.accdb;Jet OLEDB:Database Password=james");
+       OleDbCommand cmd = new OleDbCommand(queryText, cn);
+        {
+            cn.Open();  
+            cmd.Parameters.AddWithValue("@Username", txtUser.Text); 
+            cmd.Parameters.AddWithValue("@Password", txtPass.Text);
+            int result = (int)cmd.ExecuteScalar(); 
+              cn.Close();
+            if (result == 1)   
+            {
+                progressBar1.Visible = true;
+                progressBar1.Minimum = 1;
+                progressBar1.Maximum = 100000;
+                progressBar1.Value = 1;
+                progressBar1.Step = 1;
+                for (y = 1; y <= 100011; y++)
+                {
+                    progressBar1.PerformStep();
+                }
+                this.Hide();
+                Sales user = new Sales(txtUser.Text);
+                user.Show();
+            }
+            else if (a == "")
+                MessageBox.Show("Please enter your username");
+            else if (b == "")
+                MessageBox.Show("Please enter your password");
+            else
+                MessageBox.Show("User Not Found!");
+            _user();
+        }
+        }
+
+        private void _user()
+        {
+           
+            string queryText = @"SELECT Count(*) FROM usersdtb WHERE username = @Username AND password = @Password";
+            OleDbConnection cn = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\usersAcct.accdb;Jet OLEDB:Database Password=james");
+            OleDbCommand cmd = new OleDbCommand(queryText, cn);
+            {
+                cn.Open();
+                cmd.Parameters.AddWithValue("@Username", txtUser.Text);
+                cmd.Parameters.AddWithValue("@Password", txtPass.Text);
+                int result = (int)cmd.ExecuteScalar();
+                cn.Close();
+                if (_attemps == 3)
+                    if (result == 1)
+                    {
+                        
+                    }
+                    else
+                    {
+                        this.Close();
+                    }
+            }
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+      
+
+        }
+    }
