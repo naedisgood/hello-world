@@ -1,0 +1,437 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Drawing.Printing;
+using System.Linq;
+using System.Text;
+using System.Windows.Forms;
+using System.Data.OleDb;
+
+
+namespace WindowsFormsApplication1
+{
+    public partial class Sales : Form
+    {
+        OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+        OleDbDataAdapter da;
+        OleDbCommand dc;
+        DataTable ds;
+        int totalnumber = 0;
+        int itemperpage = 0;
+      
+        public Sales(string transfer)
+        {
+            
+            InitializeComponent();
+            printDocument1.DefaultPageSettings.Landscape = true;
+            label9.Text = transfer;   
+            fill2();
+            fill3();
+            fill4();
+        }
+        private void fill4()
+        {
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+            OleDbDataAdapter da = new OleDbDataAdapter("SELECT * From Dr", con);
+            DataTable ds = new DataTable();
+            da.Fill(ds);
+            dataGridView2.DataSource = ds;
+        }
+        private void fill2()
+        {
+            con.Open();
+            OleDbCommand cmd = new OleDbCommand("SELECT Titles FROM AccountTitle", con);
+            OleDbDataReader dr;
+            dr = cmd.ExecuteReader();
+
+            while (dr.Read())
+            {
+                string sName = dr.GetString(0);
+                comboBox1.Items.Add(sName);
+            }
+            con.Close();
+        }
+        private void savetrial()
+        {
+            DateTime nnow = DateTime.Now;
+            string b = dateTimePicker1.Value.ToString("");
+
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+            con.Open();
+            OleDbCommand dt = new OleDbCommand("INSERT INTO Dr ([Date], Account, Description, Debit, Credit) VALUES('" + b + "','" + comboBox1.Text + "','" + txtDesc.Text + "','" + txtAmt.Text + "','" + "0" + "')", con);
+            dt.ExecuteNonQuery();
+            OleDbDataAdapter da = new OleDbDataAdapter("SELECT * From Dr", con);
+            DataTable ds = new DataTable();
+            da.Fill(ds);
+            dataGridView2.DataSource = ds;
+            con.Close();
+        }
+
+        private void sales()
+        {
+            OleDbConnection connect = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+            connect.Open();
+            OleDbCommand dt = new OleDbCommand("INSERT INTO Sales   (Quantity, Unit, Company, Description, [Account Title], Amount, [Date]) VALUES  ('" + txtQuantity.Text + "','" + txtUnit.Text + "','" + txtCompany.Text + "','" + txtDesc.Text + "','" + comboBox1.Text + "','" + txtAmt.Text + "','" + dateTimePicker1.Value.ToString("MM/dd/yyyy") + "')", connect);
+            dt.ExecuteNonQuery();
+            OleDbDataAdapter da = new OleDbDataAdapter("SELECT * From Sales", con);
+            DataTable ds = new DataTable();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds;
+            connect.Close();
+        }
+   
+        private void Sales_Load(object sender, EventArgs e)
+        {
+            con.Open();
+            da = new OleDbDataAdapter("SELECT * From Sales", con);
+            ds = new DataTable();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds;
+            con.Close();
+            checkID();  
+        } 
+        private void checkID()
+        {
+            if (label9.Text == "user")
+            {
+                viewToolStripMenuItem.Enabled = false;
+                toolsToolStripMenuItem.Enabled = false;
+                dataGridView1.Visible = false;
+                dataGridView2.Visible = false;
+            }
+        }
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Hide();
+            Form1 frm = new Form1();
+            frm.Show();
+        }
+        private void calculatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Calc a = new Calc();
+            a.Show();
+        }
+        private void autoload()
+        {
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+            da = new OleDbDataAdapter("SELECT * From Sales where [Account Title] like('" + "Account Receivable" + "%')", con);
+            ds = new DataTable();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds;
+        }
+        private void expensesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Expenses a = new Expenses();
+            a.Show();
+        }
+        private void directCostToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Details a = new Details();
+            a.Show();
+        }
+        private void incomeStatementToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Income_Statement b = new Income_Statement();
+            b.Show();
+        }
+        private void balanceSheetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Form3 a = new Form3();
+            a.Show();
+        }
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            string a = comboBox1.Text;
+            this.comboBox1.Items.AddRange(new object[] { a });
+        }
+        private void button1_Click_1(object sender, EventArgs e)
+        {
+            
+            var q = txtQuantity.Text;
+            var u = txtUnit.Text;
+            var c = txtCompany.Text;
+            var d = txtDesc.Text;
+            var f = txtAmt.Text;
+            var g = txtOR.Text;
+            var cb = comboBox1.Text;
+
+            if (string.IsNullOrEmpty(q))
+            {
+                MessageBox.Show("Please enter a Quantity");
+                txtQuantity.Focus();
+                return;
+            }
+            else if (string.IsNullOrEmpty(u))
+            {
+                MessageBox.Show("Please enter a Unit");
+                txtUnit.Focus();
+                return;
+            }
+            else if (string.IsNullOrEmpty(c))
+            {
+                MessageBox.Show("Please enter Company Name");
+                txtCompany.Focus();
+                return;
+            }
+            else if (string.IsNullOrEmpty(d))
+            {
+                MessageBox.Show("Please enter a Description");
+                txtDesc.Focus();
+                return;
+            }
+            else if (string.IsNullOrEmpty(f))
+            {
+                MessageBox.Show("Please enter an Amount");
+                txtAmt.Focus();
+                return;
+            }
+            else if (string.IsNullOrEmpty(cb))
+            {
+                MessageBox.Show("Please select Title");
+                comboBox1.Focus();
+                return;
+            }
+            else
+            {
+                sales();
+                audit();  
+            }
+            savetrial();
+        }
+        private void audit()
+        {
+            con.Open();
+            dc = new OleDbCommand("INSERT INTO Audit ([Date], Username, Company, Description) VALUES ('" + dateTimePicker1.Value.ToString("MM/dd/yyy") + "','" + label9.Text + "','" + txtCompany.Text + "','" + txtDesc.Text + "')", con);
+            dc.ExecuteNonQuery();
+            con.Close();
+            MessageBox.Show("Transaction Completed");
+            OleDbDataAdapter da = new OleDbDataAdapter("SELECT * From Sales", con);
+            DataTable ds = new DataTable();
+            da.Fill(ds);
+            dataGridView1.DataSource = ds;
+        }
+
+        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                DataGridViewRow row = this.dataGridView1.Rows[e.RowIndex];
+
+                txtQuantity.Text = row.Cells["Quantity"].Value.ToString();
+                txtAmt.Text = row.Cells["Amount"].Value.ToString();
+                txtCompany.Text = row.Cells["Company"].Value.ToString();
+                txtDesc.Text = row.Cells["Description"].Value.ToString();
+                txtUnit.Text = row.Cells["Unit"].Value.ToString();
+                dateTimePicker1.Text = row.Cells["Date"].Value.ToString();
+            }
+        }
+        private void comboBox2_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            string a = "All";
+            if (a == comboBox2.Text)
+            {
+                da = new OleDbDataAdapter("SELECT  * FROM   Sales WHERE [Account Title]='"+"Cash", con);
+                ds = new DataTable();
+                da.Fill(ds);
+                dataGridView1.DataSource = ds;
+            }
+            else
+            {
+                da = new OleDbDataAdapter("SELECT  * FROM   Sales WHERE [Account Title]='" + comboBox2.Text, con);
+                ds = new DataTable();
+                da.Fill(ds);
+                dataGridView1.DataSource = ds;
+            }
+        }
+        private void comboBox5_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string a = "All";
+            if (a == comboBox2.Text)
+            {
+                da = new OleDbDataAdapter("SELECT  * FROM   Sales", con);
+                ds = new DataTable();
+                da.Fill(ds);
+                dataGridView1.DataSource = ds;
+            }
+            else
+            {
+                da = new OleDbDataAdapter("SELECT  * FROM   Sales WHERE [Account Title]='" + comboBox2.Text, con);
+                ds = new DataTable();
+                da.Fill(ds);
+                dataGridView1.DataSource = ds;
+            }
+        }
+        private void cashInBanksToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Audit a = new Audit();
+            a.Show();
+        }
+        
+       
+        private void fill3()
+        {
+            OleDbConnection con = new OleDbConnection(@"Provider=Microsoft.ACE.OLEDB.12.0;Data Source=C:\Users\Jaey\Documents\Transaction.accdb;Jet OLEDB:Database Password=james");
+            OleDbCommand cmd = new OleDbCommand("SELECT * FROM Titles", con);
+            OleDbDataReader dr;
+            con.Open();
+            dr = cmd.ExecuteReader();
+            con.Close();
+        }
+        private void button6_Click(object sender, EventArgs e)
+        {
+            audit();
+        }
+        private void button2_Click_2(object sender, EventArgs e)
+        {
+            con.Open();
+            OleDbCommand dc = new OleDbCommand("INSERT INTO AccountTitle (Titles) VALUES ('" + comboBox1.Text + "')", con);
+            dc.ExecuteNonQuery();
+            MessageBox.Show("Saved");
+            con.Close();
+
+
+            this.Close();
+            Sales a = new Sales("");
+            a.Show();
+        }
+        private void button2_Click_3(object sender, EventArgs e)
+        {
+            itemperpage = totalnumber = 0; 
+            printPreviewDialog1.ShowDialog();
+   
+
+        }
+        int i = 0;
+        private void printDocument1_PrintPage(object sender, System.Drawing.Printing.PrintPageEventArgs e)
+        {
+           
+            int height = 0;
+
+            Pen p = new Pen(Brushes.Black, 2.5f);
+
+
+            #region DateCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(150, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[0].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(150, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region QuantityCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(150 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[1].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(150 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region DescriptionCol
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(250 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[2].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(250 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region UnitCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(350 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[3].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(350 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region CompanyCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(450 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[4].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(450 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region Invoice NoCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(550 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[5].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(550 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region Account TitleCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(650 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[6].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(650 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            #region AmountCol
+
+            e.Graphics.FillRectangle(Brushes.DarkGray, new Rectangle(750 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+            e.Graphics.DrawString(dataGridView1.Columns[7].HeaderText.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(750 + dataGridView1.Columns[0].Width, 50, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            #endregion
+
+            height = 50;
+            while (i < dataGridView1.Rows.Count)
+            {
+                height += dataGridView1.Rows[0].Height;
+
+
+               
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[0].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(160, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+                
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[1].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(160 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+               
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[2].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(260 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+                
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[3].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(360 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+             
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[4].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(460 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+            
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[5].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(560 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+                
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[6].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(660 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+
+               
+                e.Graphics.DrawString(dataGridView1.Rows[i].Cells[7].FormattedValue.ToString(), dataGridView1.Font, Brushes.Black, new Rectangle(760 + dataGridView1.Columns[0].Width, height, dataGridView1.Columns[0].Width, dataGridView1.Rows[0].Height));
+               
+                i++;
+                
+                float currentY = 10;
+                currentY += 15;
+
+                while (totalnumber <= i)
+                {
+                    
+                    currentY += 20;
+                    totalnumber += 1;
+                    if (itemperpage <= 20)
+                    {
+                        itemperpage += 1;
+                        e.HasMorePages = false;
+                    }
+                    else
+                    {
+                        itemperpage = 0;
+                        e.HasMorePages = true;
+                        return;
+                    }
+                }
+
+            }
+        }
+
+        private void payrollToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+            Payroll a = new Payroll();
+            a.Show();
+        }
+    }
+}
+
+    
+           
+    
